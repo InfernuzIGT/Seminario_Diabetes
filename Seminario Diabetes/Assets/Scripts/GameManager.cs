@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour {
     public Text txtInsuline;
     public Text txtSugar;
 
+    [Header ("Barra Lateral")]
+    public Animator animSide; //Animator de la barra lateral
+    public Animator animBackground; //Animator del fondo oscuro
 
 
     void Awake () {
@@ -25,6 +28,12 @@ public class GameManager : MonoBehaviour {
         txtGlucose.text = ((int)varGlucose).ToString ();
         txtInsuline.text = ((int)varInsuline).ToString ();
         txtSugar.text = ((int)varSugar).ToString ();
+    }
+
+    //Activa/desactiva la barra lateral
+    public void sideScreen (bool isActive) {
+        animSide.SetBool ("isActive", isActive);
+        animBackground.SetBool ("isActive", isActive);
     }
 	
 	
