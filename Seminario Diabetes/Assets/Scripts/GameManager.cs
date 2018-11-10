@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 
     [Header ("Variables")]
-    [Range (0f, 100f)] public float varGlucose;
-    [Range (0f, 100f)] public float varInsuline;
-    [Range (0f, 100f)] public float varSugar;
+    [Range (0f, 100f)] public float varGlucose; //Glucosa
+    [Range (0f, 100f)] public float varInsuline; //Insulina
+    [Range (0f, 100f)] public float varSugar; //Azucar
 
     [Header ("Barra Informacion")]
     public Text txtGlucose;
@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour {
 
 
     void Awake () {
-		
+
 	}
 	
 	void Start () {
