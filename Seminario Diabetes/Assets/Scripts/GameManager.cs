@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour {
     public Text txtTitle;
     public Text txtCounter;
     public Animator animQuiz;
+    public GameObject goGame;
+    public GameObject goQuiz;
     public Text txtOption1;
     public Text txtOption2;
     public Text txtOption3;
@@ -110,11 +112,11 @@ public class GameManager : MonoBehaviour {
     public void sideScreen (bool isActive) {
         animSide.SetBool ("isActive", isActive);
         animBackground.SetBool ("isActive", isActive);
-        boxCollider.enabled = !isActive;
+        if (enableTransition) boxCollider.enabled = !isActive; //El IF es para que no se pise con la camara del Quiz
     }
 
 
-    void Update () {
+    /*void Update () {
 
         if (Input.GetKeyDown (KeyCode.Alpha1) && enableTransition) {
             cameraMove (0, true, false);
@@ -136,7 +138,7 @@ public class GameManager : MonoBehaviour {
             cameraMove (4, false, true);
         }
 
-    }
+    }*/
 
     
 
@@ -401,6 +403,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //Al tocar una respuesta, se ejecuta esta funcion
     public void selectOption (int _option) {
         if (_option == answersTrue) {
             answersCorrect++; //VERDADERO
@@ -424,6 +427,26 @@ public class GameManager : MonoBehaviour {
         txtCounter.text = (counter + 1).ToString () + "/" + maxQuestions.ToString (); //Indicador de pregunta actual y totales
         txtTitle.text = questions[counter]; //Pregunta
         generateRandomGame (); //Se setea un random para colocar las respuestas en los botones de manera aleatorio, y marcar cual es la correcta
+    }
+
+    //Se ejecuta esta funcion con los botones de show/back Quiz
+    public void quizShow (bool _isActive) {
+        animQuiz.SetBool ("isActive", _isActive);
+        if (_isActive) {
+            camerasPosition (1);
+            sideScreen (!_isActive);
+        } else {
+            camerasPosition (0);
+        }
+    }
+
+    //Controla las posiciones de las camaras
+    void camerasPosition (int _position) {
+        if (_position == 0) {
+            if (enableTransition) cameraMove (_position, true, false); //Camara normal
+        } else {
+            if (enableTransition) cameraMove (_position, false, true); //Camaras con zoom
+        }
     }
 
 
