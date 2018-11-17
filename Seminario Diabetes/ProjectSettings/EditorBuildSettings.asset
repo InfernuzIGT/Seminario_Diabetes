@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/0 - Main Menu_MARIANO.unity
-    guid: c415f6772cac6b849a0d753bac69db93
+    path: Assets/Scenes/version_MARIANO.unity
+    guid: 95d5871a016198a47b099a38e4124ab4
   m_configObjects: {}

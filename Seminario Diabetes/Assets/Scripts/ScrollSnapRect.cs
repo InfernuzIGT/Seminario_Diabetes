@@ -5,58 +5,28 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-//-------------------------------------------------------------------
-
-//Script no-propio, utilizado para deslizar el menu en la pantalla de juego.
-
-//-------------------------------------------------------------------
-
-
-
-//[RequireComponent(typeof(Image))]
-//[RequireComponent(typeof(Mask))]
-//[RequireComponent(typeof(ScrollRect))]
 public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler {
 
-	GameManager _GameManager;
-
-	//Capture Drag
-	float DistanceForSwipe; //0.75f
-	bool _wasSwipe = false;
-	Vector3 _startPos;
-    Vector3 _actualPos;
-    float _startVar;
-    public float _actualVar;
-    float distance;
-    float newDistance;
-
-    #region Variables
-
-    [Tooltip("Set starting page index - starting from 0")]
-    int startingPage = 1;
-    [Tooltip("Threshold time for fast swipe in seconds")]
-    float fastSwipeThresholdTime = 0.3f;
-    [Tooltip("Threshold time for fast swipe in (unscaled) pixels")]
-    int fastSwipeThresholdDistance = 100;
-    [Tooltip("How fast will page lerp to target position")]
-    float decelerationRate = 10f;
-    [Tooltip("Button to go to the previous page (optional)")]
-    GameObject prevButton;
-    [Tooltip("Button to go to the next page (optional)")]
-    GameObject nextButton;
-    [Tooltip("Sprite for unselected page (optional)")]
-    Sprite unselectedPage;
-    [Tooltip("Sprite for selected page (optional)")]
-    Sprite selectedPage;
-    [Tooltip("Container with page images (optional)")]
-    Transform pageSelectionIcons;
-
-    // fast swipes should be fast and short. If too long, then it is not fast swipe
-	private int _fastSwipeThresholdMaxLimit;
 
     private ScrollRect _scrollRectComponent;
     private RectTransform _scrollRectRect;
     private RectTransform _container;
+
+    [Header ("Pagina")]
+    public int startingPage; //Pagina en la que comienza
+    float fastSwipeThresholdTime = 0.3f; //Velocidad del swipe
+
+    [Header("COMPLETAR")]
+    public Image _background;
+    public BoxCollider boxCollider;
+
+    int fastSwipeThresholdDistance = 100; //Threshold time for fast swipe in (unscaled) pixels
+    float decelerationRate = 10f; //How fast will page lerp to target position
+    Sprite unselectedPage; //Sprite for unselected page (optional)
+    Sprite selectedPage; //Sprite for selected page (optional)
+    Transform pageSelectionIcons; //Container with page images (optional)
+
+    private int _fastSwipeThresholdMaxLimit; //fast swipes should be fast and short. If too long, then it is not fast swipe
 
     private bool _horizontal;
     
@@ -79,22 +49,17 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
     // for showing small page icons
     private bool _showPageSelection;
     private int _previousPageSelectionIndex;
+
     // container with Image components - one Image for each page
     private List<Image> _pageSelectionImages;
+    
 
-    public Image _background;
-    public BoxCollider boxCollider;
 
-    #endregion
-
-    //------------------------------------------------------------------------
     void Awake () {
 		_scrollRectComponent = GetComponent<ScrollRect>();
 		_scrollRectRect = GetComponent<RectTransform>();
-		_GameManager = FindObjectOfType<GameManager> ();
 	}
 
-    //------------------------------------------------------------------------
     void Start() {
         _container = _scrollRectComponent.content;
         _pageCount = _container.childCount;
@@ -111,32 +76,14 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
 
         _lerp = false;
 
-        // init
         SetPagePositions();
         SetPage(startingPage);
         InitPageSelection();
-        //SetPageSelection(startingPage);
 
-        // prev and next buttons
-        if (nextButton)
-            nextButton.GetComponent<Button>().onClick.AddListener(() => { NextScreen(); });
-
-        if (prevButton)
-            prevButton.GetComponent<Button>().onClick.AddListener(() => { PreviousScreen(); });
-
-        //_scrollRectComponent.horizontal = false;
-
-        _background.CrossFadeAlpha (0, 0f, true); //Color transparente
-
+        //_background.CrossFadeAlpha (0, 0, true); //COMENTAR SI NO SE ESTA TESTEANDO
     }
 
-    //------------------------------------------------------------------------
     void Update() {
-
-		//captureDrag ();
-		//disableRaycast ();
-
-
         // if moving to target position
         if (_lerp) {
             // prevent overshooting with values greater than 1
@@ -158,7 +105,6 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         }
     }
 
-    //------------------------------------------------------------------------
     private void SetPagePositions() {
         int width = 0;
         int height = 0;
@@ -206,19 +152,19 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         }
     }
 
+    //Setea la pagina
     public void SetPage(int aPageIndex) {
         aPageIndex = Mathf.Clamp(aPageIndex, 0, _pageCount - 1);
         _container.anchoredPosition = _pagePositions[aPageIndex];
         _currentPage = aPageIndex;
-		changueRaycast ();
     }
 
+    //Lerp de la pagina
     private void LerpToPage(int aPageIndex) {
         aPageIndex = Mathf.Clamp(aPageIndex, 0, _pageCount - 1);
         _lerpTo = _pagePositions[aPageIndex];
         _lerp = true;
         _currentPage = aPageIndex;
-		changueRaycast ();
 
         if (aPageIndex == 0) {
             _background.CrossFadeAlpha (0.86f, fastSwipeThresholdTime, true);
@@ -278,23 +224,6 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         LerpToPage(_currentPage - 1);
     }
 
-    public void sideScreen () {
-        LerpToPage (0);
-        boxCollider.enabled = false;
-    }
-
-    public void gameScreen () {
-        LerpToPage (1);
-        boxCollider.enabled = true;
-        if (!_scrollRectComponent.horizontal) _scrollRectComponent.horizontal = true;
-    }
-
-    public void quizScreen () {
-        LerpToPage (2);
-        boxCollider.enabled = false;
-        _scrollRectComponent.horizontal = false;
-    }
-
     private int GetNearestPage() {
         // based on distance from current position, find nearest page
         Vector2 currentPosition = _container.anchoredPosition;
@@ -313,22 +242,12 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         return nearestPage;
     }
 
-    //------------------------------------------------------------------------
     public void OnBeginDrag(PointerEventData aEventData) {
         // if currently lerping, then stop it as user is draging
         _lerp = false;
         // not dragging yet
         _dragging = false;
-
-        _startVar = Camera.main.ScreenToViewportPoint (Input.mousePosition).normalized.x;
-
-        /*_wasSwipe = false;
-		_scrollRectComponent.horizontal = false;*/
     }
-
-
-    //ScreenToViewportPoint
-
 
     public void OnEndDrag(PointerEventData aEventData) {
         // how much was container's content dragged
@@ -370,50 +289,39 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
             }
 
             if (_currentPage != 2) {
-                _actualVar = Camera.main.ScreenToViewportPoint (Input.mousePosition).normalized.x;
+                float _actualVar = Camera.main.ScreenToViewportPoint (Input.mousePosition).normalized.x;
                 _background.CrossFadeAlpha (_actualVar, 0f, true); //Color Fade
             }
-            
-
-            distance = Vector3.Distance (_startPos, _actualPos);
-
         }
     }
 
-	//------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------
 
-	/*
-	void captureDrag () {
+    public void screenSide () {
+        LerpToPage (0);
+        boxCollider.enabled = false;
+    }
 
-		if (Input.GetMouseButtonDown(0)) {
-			_startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		} else if (Input.GetMouseButton(0)) {
-			_actualPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			distance = Vector3.Distance(_startPos, _actualPos);
-			_wasSwipe = distance >= DistanceForSwipe;
-		} 
+    public void screenGame () {
+        LerpToPage (1);
+        boxCollider.enabled = true;
+        if (!_scrollRectComponent.horizontal) _scrollRectComponent.horizontal = true;
+    }
 
-		if (_wasSwipe) {
-			_scrollRectComponent.horizontal = true;
-		} else {
-			_scrollRectComponent.horizontal = false;
-		}
-	}*/
+    public void screenQuiz () {
+        LerpToPage (2);
+        boxCollider.enabled = false;
+        _scrollRectComponent.horizontal = false;
+    }
 
-	void changueRaycast () {
-		if (_currentPage == 0) {
-			_GameManager.isMenuEnabled = true;
-		} else {
-			_GameManager.isMenuEnabled = false;
-		}
-	}
+    public void screenStartDeactivate () {
+        if (_currentPage == 1) {
+            Invoke ("deactivateGameObject", 1f);
+        }
+    }
 
-	/*void disableRaycast () {
-		if (_GameManager.isMenuSliceEnabled) {
-			_scrollRectComponent.horizontal = false;
-		} else {
-			_scrollRectComponent.horizontal = true;
-		}
-	}*/
+    void deactivateGameObject () {
+        gameObject.SetActive (false);
+    }
 
 }
