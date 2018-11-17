@@ -20,14 +20,17 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
 
 	GameManager _GameManager;
 
-	/*//Capture Drag
+	//Capture Drag
 	float DistanceForSwipe; //0.75f
 	bool _wasSwipe = false;
-	private Vector3 _startPos;
-	private Vector3 _actualPos;
-	float distance;*/
+	Vector3 _startPos;
+    Vector3 _actualPos;
+    float _startVar;
+    public float _actualVar;
+    float distance;
+    float newDistance;
 
-	#region Variables
+    #region Variables
 
     [Tooltip("Set starting page index - starting from 0")]
     int startingPage = 1;
@@ -79,10 +82,15 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
     // container with Image components - one Image for each page
     private List<Image> _pageSelectionImages;
 
-	#endregion
+    public Image _background;
+    Color fadeOff = new Color (0, 0, 0, 0);
+    Color fadeOn = new Color (0, 0, 0, 128);
+    Color backgroundColor = new Color (0, 0, 0, 256);
 
-	//------------------------------------------------------------------------
-	void Awake () {
+    #endregion
+
+    //------------------------------------------------------------------------
+    void Awake () {
 		_scrollRectComponent = GetComponent<ScrollRect>();
 		_scrollRectRect = GetComponent<RectTransform>();
 		_GameManager = FindObjectOfType<GameManager> ();
@@ -118,15 +126,18 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         if (prevButton)
             prevButton.GetComponent<Button>().onClick.AddListener(() => { PreviousScreen(); });
 
-		//_scrollRectComponent.horizontal = false;
-		
-	}
+        //_scrollRectComponent.horizontal = false;
+
+        _background.CrossFadeAlpha (0, 0f, true);
+
+    }
 
     //------------------------------------------------------------------------
     void Update() {
 
 		//captureDrag ();
 		//disableRaycast ();
+
 
         // if moving to target position
         if (_lerp) {
@@ -210,6 +221,12 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         _lerp = true;
         _currentPage = aPageIndex;
 		changueRaycast ();
+
+        if (aPageIndex == 0) {
+            _background.CrossFadeAlpha (0.86f, 0f, true);
+        } else {
+            _background.CrossFadeAlpha (0, 0f, true);
+        }
     }
 
     private void InitPageSelection() {
@@ -263,6 +280,14 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         LerpToPage(_currentPage - 1);
     }
 
+    public void sideScreen () {
+        LerpToPage (0);
+    }
+
+    public void gameScreen () {
+        LerpToPage (1);
+    }
+
     private int GetNearestPage() {
         // based on distance from current position, find nearest page
         Vector2 currentPosition = _container.anchoredPosition;
@@ -288,9 +313,16 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         // not dragging yet
         _dragging = false;
 
-		/*_wasSwipe = false;
+        _startPos = (Camera.main.ScreenToViewportPoint (Input.mousePosition)).normalized;
+        _startVar = _startPos.x;
+
+        /*_wasSwipe = false;
 		_scrollRectComponent.horizontal = false;*/
     }
+
+
+    //ScreenToViewportPoint
+
 
     public void OnEndDrag(PointerEventData aEventData) {
         // how much was container's content dragged
@@ -330,6 +362,16 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
             if (_showPageSelection) {
                 SetPageSelection(GetNearestPage());
             }
+
+            _actualPos = (Camera.main.ScreenToViewportPoint (Input.mousePosition)).normalized;
+            _actualVar = _actualPos.x;
+
+            //if (_actualVar > 0.5f) _actualVar = 0.5f;
+
+            _background.CrossFadeAlpha (_actualVar, 0f, true);
+
+            distance = Vector3.Distance (_startPos, _actualPos);
+
         }
     }
 
