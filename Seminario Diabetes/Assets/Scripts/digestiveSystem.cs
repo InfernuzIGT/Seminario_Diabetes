@@ -8,7 +8,7 @@ public class DigestiveSystem : MonoBehaviour {
 
 	void Awake () {
         rBody = GetComponent<Rigidbody> ();
-        rotSpeed = 100;
+        rotSpeed = 25;
     }
 	
     //Al hacer drag, rota el modelo con friccion

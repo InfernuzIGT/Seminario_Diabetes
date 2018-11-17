@@ -19,9 +19,9 @@ public class GameManager : MonoBehaviour {
     public Text txtInsuline;
     public Text txtSugar;
 
-    [Header ("Barra Lateral")]
+    /*[Header ("Barra Lateral")]
     public Animator animSide; //Animator de la barra lateral
-    public Animator animBackground; //Animator del fondo oscuro
+    public Animator animBackground; //Animator del fondo oscuro*/
 
     [Header ("Camara")]
     public GameObject _camera; //Camara
@@ -41,9 +41,6 @@ public class GameManager : MonoBehaviour {
     [Header ("Quiz")]
     public Text txtTitle;
     public Text txtCounter;
-    public Animator animQuiz;
-    public GameObject goGame;
-    public GameObject goQuiz;
     public Text txtOption1;
     public Text txtOption2;
     public Text txtOption3;
@@ -117,8 +114,8 @@ public class GameManager : MonoBehaviour {
 
     //Activa/desactiva la barra lateral
     public void sideScreen (bool isActive) {
-        animSide.SetBool ("isActive", isActive);
-        animBackground.SetBool ("isActive", isActive);
+        //animSide.SetBool ("isActive", isActive);
+        //animBackground.SetBool ("isActive", isActive);
         if (enableTransition) boxCollider.enabled = !isActive; //El IF es para que no se pise con la camara del Quiz
     }
 
@@ -438,10 +435,10 @@ public class GameManager : MonoBehaviour {
 
     //Se ejecuta esta funcion con los botones de show/back Quiz
     public void quizShow (bool _isActive) {
-        animQuiz.SetBool ("isActive", _isActive);
+        //animQuiz.SetBool ("isActive", _isActive);
         if (_isActive) {
             camerasPosition (1);
-            sideScreen (!_isActive);
+            //sideScreen (!_isActive);
         } else {
             camerasPosition (0);
         }

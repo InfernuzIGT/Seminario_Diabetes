@@ -83,9 +83,7 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
     private List<Image> _pageSelectionImages;
 
     public Image _background;
-    Color fadeOff = new Color (0, 0, 0, 0);
-    Color fadeOn = new Color (0, 0, 0, 128);
-    Color backgroundColor = new Color (0, 0, 0, 256);
+    public BoxCollider boxCollider;
 
     #endregion
 
@@ -128,7 +126,7 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
 
         //_scrollRectComponent.horizontal = false;
 
-        _background.CrossFadeAlpha (0, 0f, true);
+        _background.CrossFadeAlpha (0, 0f, true); //Color transparente
 
     }
 
@@ -223,9 +221,9 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
 		changueRaycast ();
 
         if (aPageIndex == 0) {
-            _background.CrossFadeAlpha (0.86f, 0f, true);
+            _background.CrossFadeAlpha (0.86f, fastSwipeThresholdTime, true);
         } else {
-            _background.CrossFadeAlpha (0, 0f, true);
+            _background.CrossFadeAlpha (0, fastSwipeThresholdTime, true);
         }
     }
 
@@ -282,10 +280,19 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
 
     public void sideScreen () {
         LerpToPage (0);
+        boxCollider.enabled = false;
     }
 
     public void gameScreen () {
         LerpToPage (1);
+        boxCollider.enabled = true;
+        if (!_scrollRectComponent.horizontal) _scrollRectComponent.horizontal = true;
+    }
+
+    public void quizScreen () {
+        LerpToPage (2);
+        boxCollider.enabled = false;
+        _scrollRectComponent.horizontal = false;
     }
 
     private int GetNearestPage() {
@@ -313,8 +320,7 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         // not dragging yet
         _dragging = false;
 
-        _startPos = (Camera.main.ScreenToViewportPoint (Input.mousePosition)).normalized;
-        _startVar = _startPos.x;
+        _startVar = Camera.main.ScreenToViewportPoint (Input.mousePosition).normalized.x;
 
         /*_wasSwipe = false;
 		_scrollRectComponent.horizontal = false;*/
@@ -363,12 +369,11 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
                 SetPageSelection(GetNearestPage());
             }
 
-            _actualPos = (Camera.main.ScreenToViewportPoint (Input.mousePosition)).normalized;
-            _actualVar = _actualPos.x;
-
-            //if (_actualVar > 0.5f) _actualVar = 0.5f;
-
-            _background.CrossFadeAlpha (_actualVar, 0f, true);
+            if (_currentPage != 2) {
+                _actualVar = Camera.main.ScreenToViewportPoint (Input.mousePosition).normalized.x;
+                _background.CrossFadeAlpha (_actualVar, 0f, true); //Color Fade
+            }
+            
 
             distance = Vector3.Distance (_startPos, _actualPos);
 
