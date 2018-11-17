@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
+    [Header ("Booleans")]
+    public bool isMenuEnabled; //Si el menu esta activo (PANTALLA DEL COSTADO)
+    //public bool isMenuSliceEnabled; //Si el slice del menu esta activo (HACE QUE NO SE PUEDA MOVER LA PANTALLA DEL COSTADO)
+
     [Header ("Variables")]
     [Range (0f, 100f)] public float varGlucose; //Glucosa
     [Range (0f, 100f)] public float varInsuline; //Insulina
@@ -106,6 +110,9 @@ public class GameManager : MonoBehaviour {
         isMoving = true;
         StartCoroutine (cameraMovement ()); //Da comienzo a la corrutina que mueve la camara
         startQuiz (); //Setea de entrada el Quiz
+
+        isMenuEnabled = false;
+        //isMenuSliceEnabled = true;
     }
 
     //Activa/desactiva la barra lateral
