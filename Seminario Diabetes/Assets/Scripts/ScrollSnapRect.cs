@@ -166,11 +166,25 @@ public class ScrollSnapRect : MonoBehaviour, IBeginDragHandler, IEndDragHandler,
         _lerp = true;
         _currentPage = aPageIndex;
 
-        if (aPageIndex == 0) {
+
+        switch (aPageIndex) {
+            case 0:
+                _background.CrossFadeAlpha (0.86f, fastSwipeThresholdTime, true);
+                break;
+            case 1:
+                _background.CrossFadeAlpha (0, fastSwipeThresholdTime, true);
+                boxCollider.enabled = true;
+                break;
+            default:
+                _background.CrossFadeAlpha (0, fastSwipeThresholdTime, true);
+                break;
+        }
+
+        /*if (aPageIndex == 0) {
             _background.CrossFadeAlpha (0.86f, fastSwipeThresholdTime, true);
         } else {
             _background.CrossFadeAlpha (0, fastSwipeThresholdTime, true);
-        }
+        }*/
     }
 
     private void InitPageSelection() {

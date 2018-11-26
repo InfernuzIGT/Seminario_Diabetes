@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour {
     Quaternion modelRotY; //Almacena la rotacion inicial del modelo
     bool isRotating; //Si el modelo se tiene que rotar para volver a su rotacion inicial
 
+    [Header ("Otros")]
+    public Button btnBackQuiz;
 
     
     void Awake () {
@@ -41,6 +43,7 @@ public class GameManager : MonoBehaviour {
         cameraCurrentView = cameraViews[0]; //Posicion default
         enableTransition = true;
         isMoving = true;
+        btnBackQuiz.interactable = false;
         StartCoroutine (cameraMovement ()); //Da comienzo a la corrutina que mueve la camara
     }
 
@@ -109,13 +112,18 @@ public class GameManager : MonoBehaviour {
 
     //Se ejecuta esta funcion con los botones de show/back Quiz
     public void quizShow (bool _isActive) {
-        //animQuiz.SetBool ("isActive", _isActive);
         if (_isActive) {
-            camerasPosition (1);
-            //sideScreen (!_isActive);
+            camerasPosition (1); //Va al Quiz
+            Invoke ("activateBackQuiz", 1f);
         } else {
-            camerasPosition (0);
+            camerasPosition (0); //Vuelve al Menu Principal
+            btnBackQuiz.interactable = false;
         }
+    }
+
+    //Evita que se bugee la camara al presionar rapidamente el boton BACK en el Quiz
+    void activateBackQuiz () {
+        btnBackQuiz.interactable = true;
     }
 
     //Controla las posiciones de las camaras
